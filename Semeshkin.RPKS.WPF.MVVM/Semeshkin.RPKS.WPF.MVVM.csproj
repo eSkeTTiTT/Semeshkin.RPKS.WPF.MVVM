@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Semeshkin.Wpf.Controls\Semeshkin.Wpf.Controls.csproj" />
+    <ProjectReference Include="..\Semeshkin.WPF.MVVM.Core\Semeshkin.WPF.MVVM.Core.csproj" />
+    <ProjectReference Include="..\Semeshkin.WPF.MVVM\Semeshkin.WPF.MVVM.csproj" />
+    <ProjectReference Include="..\Semeshkin.Wpf.Styles\Semeshkin.Wpf.Styles.csproj" />
+  </ItemGroup>
+
+</Project>

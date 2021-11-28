@@ -1,0 +1,66 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Semeshkin.Wpf.Styles">
+
+    <!--ScrollViewer-->
+    <Style x:Key="ScrollViewerStyle" TargetType="ScrollViewer">
+        <Style.Setters>
+            
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        
+                        <ControlTemplate.Resources>
+                            <Style TargetType="{x:Type ScrollBar}" x:Key="scroll">
+                                <Style.Setters>
+                                    <Setter Property="Background" Value="Black" />
+                                </Style.Setters>
+                            </Style>
+                        </ControlTemplate.Resources>
+                       
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0"
+                                    Grid.Column="0">
+                                <ScrollContentPresenter CanContentScroll="{TemplateBinding CanContentScroll}" />
+                            </Border>
+                            <ScrollBar x:Name="VerticalScrollBar" Style="{StaticResource scroll}"
+                                       Grid.Row="0"
+                                       Grid.Column="1"
+                                       Value="{TemplateBinding VerticalOffset}"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                       Background="{TemplateBinding Background}"/>
+                            <ScrollBar x:Name="HorizontalScrollBar"
+                                       Grid.Row="1"
+                                       Grid.Column="0"
+                                       Orientation="Horizontal"
+                                       Value="{TemplateBinding HorizontalOffset}"
+                                       Maximum="{TemplateBinding ScrollableWidth}"
+                                       ViewportSize="{TemplateBinding ViewportWidth}"
+                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                                       Background="{TemplateBinding Background}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+    
+    
+    <!--Button-->
+    <Style x:Key="ButtonStyle" TargetType="Button">
+        
+        
+    </Style>
+
+</ResourceDictionary>

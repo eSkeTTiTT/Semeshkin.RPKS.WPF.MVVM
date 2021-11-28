@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\rueng.png" />
+    <None Remove="Images\rueng_dark.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Semeshkin.WPF.MVVM\Semeshkin.WPF.MVVM.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\rueng.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\rueng_dark.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+</Project>
