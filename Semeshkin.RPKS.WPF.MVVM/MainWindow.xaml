@@ -40,7 +40,7 @@
             <control:LetterKeyboard ChangeLanguageCommand="{Binding ChangeLanguageCommand}"
                                     CapslkCommand="{Binding CapslkCommand}"
                                     BackspaceCommand="{Binding BackspaceCommand}"
-                                    LetterCommand="{Binding LetterCommand}"/>
+                                    LetterCommand="{Binding LetterCommand}" />
         </StackPanel>
         
 
@@ -54,6 +54,14 @@
                                  BackspaceCommand="{Binding BackspaceCommand}"/>
 
         </StackPanel>
-        
+
+        <StackPanel>
+            <StackPanel.DataContext>
+                <viewmodels:NumericUpDownViewModel />
+            </StackPanel.DataContext>
+            <control:NumericUpDown MaxValue="100" MinValue="0" Value="0"
+                                   IncrementStepCommand="{Binding IncrementStepCommand}" 
+                                   DecrementStepCommand="{Binding DecrementStepCommand}" />
+        </StackPanel>
     </Grid>
 </Window>
