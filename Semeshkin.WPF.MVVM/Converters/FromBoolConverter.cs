@@ -12,12 +12,12 @@ namespace Semeshkin.WPF.MVVM.Converters
         {
             if (!(values[0] is bool))
             {
-                throw new ArgumentException("Type of values[0] is not bool!", nameof(values));
+                throw new ArgumentException($"Type of values[0] is not {typeof(bool).FullName}!", nameof(values));
             }
 
             if (values.Length != 3)
             {
-                return new ArgumentException("Values length is not 3!", nameof(parameter));
+                return new ArgumentException("Values length is not 3");
             }
 
             if (values[0] == DependencyProperty.UnsetValue ||

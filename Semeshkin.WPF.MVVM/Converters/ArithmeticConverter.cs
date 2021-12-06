@@ -7,13 +7,22 @@ namespace Semeshkin.WPF.MVVM.Converters
 {
     public sealed class ArithmeticConverter : MultiConverterBase<ArithmeticConverter>
     {
+        public enum Operators
+        {
+            Addition,
+            Subtraction,
+            Multiplication,
+            Division,
+            DivisionRemainder
+        }
+
         public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
 
             //check type of parameter - need string
-            if (!(parameter is string operation))
+            if (!(parameter is Operators operation))
             {
-                throw new ArgumentException("Type of parametr is not string!", nameof(parameter));
+                throw new ArgumentException($"Type of parameter is not {typeof(Operators).FullName}", nameof(parameter));
             }
 
             //also need to check the lenght of values
@@ -33,11 +42,11 @@ namespace Semeshkin.WPF.MVVM.Converters
 
             return operation switch
             {
-                "+" => leftOperand + rightOperand,
-                "-" => leftOperand - rightOperand,
-                "*" => leftOperand * rightOperand,
-                "/" => leftOperand / rightOperand,
-                "%" => leftOperand % rightOperand,
+                Operators.Addition => leftOperand + rightOperand,
+                Operators.Subtraction => leftOperand - rightOperand,
+                Operators.Multiplication => leftOperand * rightOperand,
+                Operators.Division => leftOperand / rightOperand,
+                Operators.DivisionRemainder => leftOperand % rightOperand,
                 _ => throw new ArgumentException($"Invalid operation {operation}", nameof(operation))
             };
 

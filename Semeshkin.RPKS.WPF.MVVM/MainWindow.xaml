@@ -7,6 +7,7 @@
         xmlns:viewmodels="clr-namespace:Semeshkin.RPKS.WPF.MVVM.ViewModels"
         xmlns:viewmodel="clr-namespace:Semeshkin.Wpf.Styles;assembly=Semeshkin.Wpf.Styles"
         xmlns:control="clr-namespace:Semeshkin.Wpf.Controls;assembly=Semeshkin.Wpf.Controls"
+        xmlns:data="clr-namespace:Semeshkin.WPF.MVVM.Data;assembly=Semeshkin.WPF.MVVM"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 
@@ -63,5 +64,20 @@
                                    IncrementStepCommand="{Binding IncrementStepCommand}" 
                                    DecrementStepCommand="{Binding DecrementStepCommand}" />
         </StackPanel>
+
+        <control:Spinner Grid.Row="1" Grid.Column="1" Speed="1"
+                         CircleCount="3" CircleFill="Black"
+                         CircleSize="23" />
+
+        <control:DialogHost Grid.Row="1" Grid.Column="2" 
+                            WhiteCornerRadius="10" BlackCornerRadius="10"
+                            WhiteOpacity="0.5" BlackOpacity="0.5">
+            
+        </control:DialogHost>
+
+        <control:MessageDialog Grid.Row="2" Grid.Column="0" FontSize="10" Foreground="Black"
+                               ButtonStyle="{x:Static data:TypesOfButtons.OkCancel}" >
+            
+        </control:MessageDialog>
     </Grid>
 </Window>

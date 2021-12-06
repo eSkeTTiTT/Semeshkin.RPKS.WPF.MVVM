@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="Semeshkin.Wpf.Controls.DialogHost"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewmodels="clr-namespace:Semeshkin.Wpf.Controls.ViewModels"
+             xmlns:converters="clr-namespace:Semeshkin.WPF.MVVM.Converters;assembly=Semeshkin.WPF.MVVM"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:Semeshkin.Wpf.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.DataContext>
+        <viewmodels:DialogHostViewModel />
+    </UserControl.DataContext>
+
+    <UserControl.Template>
+        <ControlTemplate>
+            <Border x:Name="BlackBorder" Background="Black"
+                    Opacity="{Binding BlackOpacity, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:DialogHost}}}"
+                    CornerRadius="{Binding BlackCornerRadius, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:DialogHost}}}">
+                <Border.InputBindings>
+                    <MouseBinding Gesture="LeftClick" 
+                                  Command="{Binding CloseDialogCommand}" 
+                                  CommandParameter="{Binding ElementName=WhiteBorder}"/>
+                </Border.InputBindings>
+                <Border x:Name="WhiteBorder" Margin="10,10,10,25" Background="White"
+                        Opacity="{Binding WhiteOpacity, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:DialogHost}}}"
+                        CornerRadius="{Binding WhiteCornerRadius, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:DialogHost}}}">
+                    <ContentPresenter Content="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:DialogHost}}}" 
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center">
+                        <ContentPresenter.Height>
+                            <MultiBinding Converter="{converters:ArithmeticConverter}"
+                                          ConverterParameter="{x:Static converters:ArithmeticConverter+Operators.Subtraction}">
+                                <MultiBinding.Bindings>
+                                    <Binding Path="ActualHeight" 
+                                             RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Border}}"/>
+                                    <Binding>
+                                        <Binding.Source>
+                                            <system:Double>
+                                                10.0
+                                            </system:Double>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding.Bindings>
+                            </MultiBinding>
+                        </ContentPresenter.Height>
+                        <ContentPresenter.Width>
+                            <MultiBinding Converter="{converters:ArithmeticConverter}"
+                                          ConverterParameter="{x:Static converters:ArithmeticConverter+Operators.Subtraction}">
+                                <MultiBinding.Bindings>
+                                    <Binding Path="ActualWidth" 
+                                             RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Border}}"/>
+                                    <Binding>
+                                        <Binding.Source>
+                                            <system:Double>
+                                                10.0
+                                            </system:Double>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding.Bindings>
+                            </MultiBinding>
+                        </ContentPresenter.Width>
+                    </ContentPresenter>
+                </Border>
+            </Border>
+        </ControlTemplate>
+    </UserControl.Template>
+
+</UserControl>
