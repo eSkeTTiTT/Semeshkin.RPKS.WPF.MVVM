@@ -1,0 +1,147 @@
+﻿<Window x:Class="Semeshkin.RPKS.WPF.MVVM.Views.SortWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Semeshkin.RPKS.WPF.MVVM.Views"
+        xmlns:viewmodels="clr-namespace:Semeshkin.RPKS.WPF.MVVM.ViewModels"
+        xmlns:attached="clr-namespace:Semeshkin.Wpf.Styles;assembly=Semeshkin.Wpf.Styles"
+        xmlns:control="clr-namespace:Semeshkin.Wpf.Controls;assembly=Semeshkin.Wpf.Controls"
+        xmlns:data="clr-namespace:Semeshkin.WPF.MVVM.Data;assembly=Semeshkin.WPF.MVVM"
+        xmlns:converters="clr-namespace:Semeshkin.WPF.MVVM.Converters;assembly=Semeshkin.WPF.MVVM"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="SortWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <viewmodels:SortViewModel />
+    </Window.DataContext>
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Width">
+                <Setter.Value>
+                    <MultiBinding Converter="{converters:ArithmeticConverter}"
+                              ConverterParameter="{x:Static converters:ArithmeticConverter+Operators.Division}">
+                        <MultiBinding.Bindings>
+                            <Binding Path="ActualWidth"
+                                 ElementName="Numeric" />
+                            <Binding>
+                                <Binding.Source>
+                                    <system:Double>
+                                        2.0
+                                    </system:Double>
+                                </Binding.Source>
+                            </Binding>
+                        </MultiBinding.Bindings>
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!--ScrollViewer Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Disabled"
+                      Margin="13">
+            <ItemsControl ItemsSource="{Binding MyCollection}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ProgressBar Value="{Binding Path=.}" Orientation="Vertical"
+                                     Background="Transparent" Width="50" Foreground="Red"
+                                     Minimum="1" Maximum="5"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer-->
+
+        <control:NumericUpDown x:Name="Numeric" Value="{Binding NumericValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                               IncrementStepCommand="{Binding NumericUpDownViewModel.IncrementStepCommand}"
+                               DecrementStepCommand="{Binding NumericUpDownViewModel.DecrementStepCommand}"
+                               VerticalAlignment="Top"
+                               MinValue="1" MaxValue="10000"
+                               Margin="5,5,5,0">
+        </control:NumericUpDown>
+        <Button Height="{Binding Path=ActualHeight, ElementName=Numeric}"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Content="Создать массив"
+                Command="{Binding CreateArrayCommand}" />
+
+        <Button Margin="0,75,0,0" Height="{Binding Path=ActualHeight, ElementName=Numeric}"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Content="Перемешать"
+                Command="{Binding RefreshArrayCommand}" />
+
+        <DockPanel Grid.Row="1">
+            <Label DockPanel.Dock="Top" Content="Сортируемые данные"/>
+            <ScrollViewer Grid.Row="1">
+                <TextBlock TextWrapping="Wrap"
+                 Text="{Binding ArrayText, Mode=OneWay}" />
+            </ScrollViewer>
+        </DockPanel>
+
+        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10,0,0,0">
+            <Label Content="Задать скорость отображения" />
+            <StackPanel Orientation="Horizontal">
+                <Slider x:Name="SpeedSlider" DockPanel.Dock="Left" Value="{Binding SliderValue, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" 
+                Minimum="0" Maximum="100" SelectionStart="0" IsSelectionRangeEnabled="True"
+                SelectionEnd="{Binding Value, RelativeSource={RelativeSource Self}}">
+                    <Slider.Width>
+                        <MultiBinding Converter="{converters:ArithmeticConverter}"
+                                      ConverterParameter="{x:Static converters:ArithmeticConverter+Operators.Division}">
+                            <MultiBinding.Bindings>
+                                <Binding Path="ActualWidth" 
+                                         RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type StackPanel}}"/>
+                                <Binding>
+                                    <Binding.Source>
+                                        <system:Double>
+                                            1.3
+                                        </system:Double>
+                                    </Binding.Source>
+                                </Binding>
+                            </MultiBinding.Bindings>
+                        </MultiBinding>
+                    </Slider.Width>
+                </Slider>
+                <TextBlock Text="{Binding SliderValue, Mode=OneWay}" />
+            </StackPanel>
+            <Label Content="Выбрать тип отображения"/>
+            <ComboBox HorizontalAlignment="Left">
+                <ComboBoxItem IsSelected="True">
+                    <TextBlock Text="Гистограмма"/>
+                </ComboBoxItem>
+                <TextBlock Text="Круговая диаграмма"/>
+                <ComboBox.Width>
+                    <MultiBinding Converter="{converters:ArithmeticConverter}"
+                                      ConverterParameter="{x:Static converters:ArithmeticConverter+Operators.Division}">
+                        <MultiBinding.Bindings>
+                            <Binding Path="ActualWidth" 
+                                         RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type StackPanel}}"/>
+                            <Binding>
+                                <Binding.Source>
+                                    <system:Double>
+                                        1.2
+                                    </system:Double>
+                                </Binding.Source>
+                            </Binding>
+                        </MultiBinding.Bindings>
+                    </MultiBinding>
+                </ComboBox.Width>
+            </ComboBox>
+        </StackPanel>
+    </Grid>
+</Window>

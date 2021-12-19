@@ -1,6 +1,6 @@
-﻿using System.Drawing;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Semeshkin.Wpf.Styles
 {
@@ -12,17 +12,17 @@ namespace Semeshkin.Wpf.Styles
         {
             BackgroundColorProperty = DependencyProperty.RegisterAttached(
                 "BackgroundColor",
-                typeof(Color),
+                typeof(Brush),
                 typeof(ScrollViewerAttached),
-                new PropertyMetadata(Color.Black));
+                new PropertyMetadata(Brushes.Black));
         }
 
-        public static Color GetBackgroundColor(DependencyObject obj)
+        public static Brush GetBackgroundColor(DependencyObject obj)
         {
-            return (Color)obj.GetValue(BackgroundColorProperty);
+            return (Brush)obj.GetValue(BackgroundColorProperty);
         }
 
-        public static void SetBackgroundColor(DependencyObject obj, Color value)
+        public static void SetBackgroundColor(DependencyObject obj, Brush value)
         {
             obj.SetValue(BackgroundColorProperty, value);
         }

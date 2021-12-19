@@ -35,6 +35,5 @@ namespace Semeshkin.WPF.MVVM.Core.Command
         {
             _execute(parameter);
         }
-
     }
 }

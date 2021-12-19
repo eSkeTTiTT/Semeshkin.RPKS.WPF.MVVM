@@ -6,9 +6,14 @@
              xmlns:visible="clr-namespace:System.Windows;assembly=PresentationCore"
              xmlns:converters="clr-namespace:Semeshkin.WPF.MVVM.Converters;assembly=Semeshkin.WPF.MVVM"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:viewmodels="clr-namespace:Semeshkin.Wpf.Controls.ViewModels"
              xmlns:local="clr-namespace:Semeshkin.Wpf.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.DataContext>
+        <viewmodels:DialogHostViewModel />
+    </UserControl.DataContext>
     
     <UserControl.Resources>
         <Style TargetType="{x:Type Button}">
@@ -27,7 +32,7 @@
                             <Binding>
                                 <Binding.Source>
                                     <system:Double>
-                                        8.0
+                                        3.0
                                     </system:Double>
                                 </Binding.Source>
                             </Binding>
@@ -35,13 +40,17 @@
                     </MultiBinding>
                 </Setter.Value>
             </Setter>
+            <Setter Property="Command" 
+                    Value="{Binding ButtonCommand}"/>
+            <Setter Property="CommandParameter" 
+                    Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid}}}"/>
         </Style>
     </UserControl.Resources>
     
     <Grid>
         <local:DialogHost WhiteCornerRadius="10" BlackCornerRadius="10"
                           WhiteOpacity="0.8" BlackOpacity="0.5">
-            <ScrollViewer>
+            <ScrollViewer Style="{Binding Style, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:MessageDialog}}}">
                 <TextBlock Text="При выравнивании текста по ширине между словами добавляется пространство, чтобы оба края каждой строки были выровнены относительно обоих полей. Последняя строка абзаца выравнивается по левому краю."
                            TextWrapping="Wrap"
                            TextAlignment="Justify"

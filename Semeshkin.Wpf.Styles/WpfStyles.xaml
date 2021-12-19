@@ -5,20 +5,9 @@
     <!--ScrollViewer-->
     <Style x:Key="ScrollViewerStyle" TargetType="ScrollViewer">
         <Style.Setters>
-            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ScrollViewer">
-                        
-                        <ControlTemplate.Resources>
-                            <Style TargetType="{x:Type ScrollBar}" x:Key="scroll">
-                                <Style.Setters>
-                                    <Setter Property="Background" Value="Black" />
-                                </Style.Setters>
-                            </Style>
-                        </ControlTemplate.Resources>
-                       
-                        
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -32,14 +21,14 @@
                                     Grid.Column="0">
                                 <ScrollContentPresenter CanContentScroll="{TemplateBinding CanContentScroll}" />
                             </Border>
-                            <ScrollBar x:Name="VerticalScrollBar" Style="{StaticResource scroll}"
+                            <ScrollBar x:Name="VerticalScrollBar"
                                        Grid.Row="0"
                                        Grid.Column="1"
                                        Value="{TemplateBinding VerticalOffset}"
                                        Maximum="{TemplateBinding ScrollableHeight}"
                                        ViewportSize="{TemplateBinding ViewportHeight}"
                                        Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
-                                       Background="{TemplateBinding Background}"/>
+                                       Background="{Binding Path=(local:ScrollViewerAttached.BackgroundColor), RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ScrollViewer}}}"/>
                             <ScrollBar x:Name="HorizontalScrollBar"
                                        Grid.Row="1"
                                        Grid.Column="0"
@@ -48,7 +37,7 @@
                                        Maximum="{TemplateBinding ScrollableWidth}"
                                        ViewportSize="{TemplateBinding ViewportWidth}"
                                        Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
-                                       Background="{TemplateBinding Background}"/>
+                                       Background="{Binding Path=(local:ScrollViewerAttached.BackgroundColor), RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ScrollViewer}}}"/>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
@@ -59,8 +48,37 @@
     
     <!--Button-->
     <Style x:Key="ButtonStyle" TargetType="Button">
-        
-        
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Height="{TemplateBinding Height}"
+                            Width="{TemplateBinding Width}"
+                            Background="{TemplateBinding Background}"
+                            TextBlock.FontFamily="{TemplateBinding FontFamily}"
+                            TextBlock.FontSize="{TemplateBinding FontSize}"
+                            TextBlock.Foreground="{TemplateBinding Foreground}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center">
+                        </ContentPresenter>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="True">
+                            <Trigger.Setters>
+                                <Setter Property="Background" Value="{Binding Path=(local:ButtonAttached.EnabledBackground), RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Border}}}"/>
+                                <Setter Property="Foreground" Value="{Binding Path=(local:ButtonAttached.EnabledForeground), RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Border}}}"/>
+                            </Trigger.Setters>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Trigger.Setters>
+                                <Setter Property="Background" Value="{Binding Path=(local:ButtonAttached.NotEnabledBackground), RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Border}}}"/>
+                                <Setter Property="Foreground" Value="{Binding Path=(local:ButtonAttached.NotEnabledForeground), RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Border}}}"/>
+                            </Trigger.Setters>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

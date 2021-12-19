@@ -25,6 +25,7 @@ namespace Semeshkin.Wpf.Controls
         {
             InitializeComponent();
             _vm = (SpinnerViewModel)DataContext;
+            _vm.SetActualSize(mainCanvas.Height, mainCanvas.Width);
         }
 
 
@@ -39,7 +40,7 @@ namespace Semeshkin.Wpf.Controls
             nameof(CircleSize),
             typeof(double),
             typeof(Spinner),
-            new PropertyMetadata(default(double),
+            new PropertyMetadata(10.0,
                 (d, e) =>
                 {
                     Spinner userControl = d as Spinner;

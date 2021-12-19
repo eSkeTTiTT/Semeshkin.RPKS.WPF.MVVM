@@ -58,6 +58,8 @@ namespace Semeshkin.Wpf.Controls.ViewModels
 
         public void FillMyValues(double size, Color color) => _model.FillCollection(size, color);
 
+        public void SetActualSize(double height, double width) => _model.SetActualState(height, width);
+
         #endregion
     }
 }

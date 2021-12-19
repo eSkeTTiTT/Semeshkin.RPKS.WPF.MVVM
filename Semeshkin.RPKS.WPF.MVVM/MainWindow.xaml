@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Semeshkin.RPKS.WPF.MVVM"
         xmlns:viewmodels="clr-namespace:Semeshkin.RPKS.WPF.MVVM.ViewModels"
-        xmlns:viewmodel="clr-namespace:Semeshkin.Wpf.Styles;assembly=Semeshkin.Wpf.Styles"
+        xmlns:attached="clr-namespace:Semeshkin.Wpf.Styles;assembly=Semeshkin.Wpf.Styles"
         xmlns:control="clr-namespace:Semeshkin.Wpf.Controls;assembly=Semeshkin.Wpf.Controls"
         xmlns:data="clr-namespace:Semeshkin.WPF.MVVM.Data;assembly=Semeshkin.WPF.MVVM"
         mc:Ignorable="d"
@@ -26,11 +26,8 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <ScrollViewer Grid.Row="1" Grid.Column="1" 
-            Style="{StaticResource ScrollViewerStyle}"
-                      
-                      >
-
+        <ScrollViewer Grid.Row="0" Grid.Column="1" Style="{StaticResource ScrollViewerStyle}"
+                      attached:ScrollViewerAttached.BackgroundColor="Beige">
         </ScrollViewer>
 
         <StackPanel Grid.Row="1" Grid.Column="0">
@@ -66,17 +63,20 @@
         </StackPanel>
 
         <control:Spinner Grid.Row="1" Grid.Column="1" Speed="1"
-                         CircleCount="3" CircleFill="Black"
+                         CircleCount="2" CircleFill="Blue"
                          CircleSize="23" />
 
         <control:DialogHost Grid.Row="1" Grid.Column="2" 
                             WhiteCornerRadius="10" BlackCornerRadius="10"
                             WhiteOpacity="0.5" BlackOpacity="0.5">
-            
+            <Button Style="{StaticResource ButtonStyle}"
+                    Content="228" IsEnabled="False">
+                
+            </Button>
         </control:DialogHost>
 
         <control:MessageDialog Grid.Row="2" Grid.Column="0" FontSize="10" Foreground="Black"
-                               ButtonStyle="{x:Static data:TypesOfButtons.OkCancel}" >
+                               ButtonStyle="{x:Static data:TypesOfButtons.YesNo}" >
             
         </control:MessageDialog>
     </Grid>

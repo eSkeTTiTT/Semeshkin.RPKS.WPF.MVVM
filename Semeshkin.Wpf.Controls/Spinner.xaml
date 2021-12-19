@@ -17,11 +17,16 @@
         
     </UserControl.Resources>
 
-    <Canvas x:Name="mainCanvas" Background="Transparent">
-        <ListBox ItemsSource="{Binding MyValues}">
-            
-        </ListBox>
-        <Canvas.RenderTransform>
+    <Canvas x:Name="mainCanvas" Height="100" Width="100" Background="Transparent">
+        <ItemsControl ItemsSource="{Binding MyValues}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas x:Name="canvas" Height="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Canvas}}}"
+                            Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Canvas}}}"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <!--Canvas.RenderTransform>
             <RotateTransform Angle="{Binding Angle, Mode=OneWay}">
                 <RotateTransform.CenterX>
                     <MultiBinding Converter="{converters:ArithmeticConverter}"
@@ -56,6 +61,6 @@
                     </MultiBinding>
                 </RotateTransform.CenterY>
             </RotateTransform>
-        </Canvas.RenderTransform>
+        </Canvas.RenderTransform-->
     </Canvas>
 </UserControl>

@@ -49,7 +49,6 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         private bool CheckForExecute(TextBox tb)
         {
             return int.TryParse(tb.Text, out _);
-            //return true;
         }
 
         #endregion

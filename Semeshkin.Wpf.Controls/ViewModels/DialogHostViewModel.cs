@@ -15,12 +15,14 @@ namespace Semeshkin.Wpf.Controls.ViewModels
         #region Fields
 
         private ICommand _closeDialogCommand;
+        private ICommand _buttonCommand;
 
         #endregion
 
         #region Properties
 
         public ICommand CloseDialogCommand => _closeDialogCommand ??= new RelayCommand(border => CloseDialog(border as Border));
+        public ICommand ButtonCommand => _buttonCommand ??= new RelayCommand(grid => CloseControl(grid as Grid));
 
         #endregion
 
@@ -31,6 +33,11 @@ namespace Semeshkin.Wpf.Controls.ViewModels
             border.Visibility = border.Visibility == Visibility.Visible
                                 ? Visibility.Hidden
                                 : Visibility.Visible;
+        }
+
+        private void CloseControl(Grid grid)
+        {
+            grid.Visibility = Visibility.Collapsed;
         }
 
         #endregion
