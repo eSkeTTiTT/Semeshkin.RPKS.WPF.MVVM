@@ -16,7 +16,9 @@
         <viewmodels:SortViewModel />
     </Window.DataContext>
     <Window.Resources>
-        <Style TargetType="{x:Type Button}">
+        <Style TargetType="{x:Type Button}" x:Key="ButtonStyle">
+            <Setter Property="Margin" Value="0,5,0,0" />
+            <Setter Property="Height" Value="{Binding Path=ActualHeight, ElementName=Numeric}" />
             <Setter Property="Width">
                 <Setter.Value>
                     <MultiBinding Converter="{converters:ArithmeticConverter}"
@@ -27,7 +29,7 @@
                             <Binding>
                                 <Binding.Source>
                                     <system:Double>
-                                        2.0
+                                        3.0
                                     </system:Double>
                                 </Binding.Source>
                             </Binding>
@@ -49,7 +51,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!--ScrollViewer Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2"
+        <ScrollViewer Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Disabled"
                       Margin="13">
@@ -61,30 +63,33 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <ProgressBar Value="{Binding Path=.}" Orientation="Vertical"
-                                     Background="Transparent" Width="50" Foreground="Red"
-                                     Minimum="1" Maximum="5"/>
+                        <ProgressBar Value="{Binding Path=Value}" Orientation="Vertical"
+                                     Background="Transparent" Width="50" Foreground="{Binding ValueColor}"
+                                     Minimum="0" Maximum="{Binding Path=Value, ElementName=Numeric}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </ScrollViewer-->
+        </ScrollViewer>
 
-        <control:NumericUpDown x:Name="Numeric" Value="{Binding NumericValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+        <StackPanel x:Name="NumericStack"
+                    IsEnabled="{Binding PauseEnabled, Mode=OneWay}">
+            <control:NumericUpDown x:Name="Numeric" Value="{Binding NumericValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                IncrementStepCommand="{Binding NumericUpDownViewModel.IncrementStepCommand}"
                                DecrementStepCommand="{Binding NumericUpDownViewModel.DecrementStepCommand}"
                                VerticalAlignment="Top"
                                MinValue="1" MaxValue="10000"
                                Margin="5,5,5,0">
-        </control:NumericUpDown>
-        <Button Height="{Binding Path=ActualHeight, ElementName=Numeric}"
+            </control:NumericUpDown>
+            <Button Style="{StaticResource ButtonStyle}"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
                 Content="Создать массив"
                 Command="{Binding CreateArrayCommand}" />
 
-        <Button Margin="0,75,0,0" Height="{Binding Path=ActualHeight, ElementName=Numeric}"
+            <Button Style="{StaticResource ButtonStyle}"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
                 Content="Перемешать"
                 Command="{Binding RefreshArrayCommand}" />
+        </StackPanel>
 
         <DockPanel Grid.Row="1">
             <Label DockPanel.Dock="Top" Content="Сортируемые данные"/>
@@ -94,7 +99,8 @@
             </ScrollViewer>
         </DockPanel>
 
-        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10,0,0,0">
+        <StackPanel x:Name="SettingsStack" Grid.Column="1" Orientation="Vertical" Margin="10,0,0,0"
+                    IsEnabled="{Binding PauseEnabled, Mode=OneWay}">
             <Label Content="Задать скорость отображения" />
             <StackPanel Orientation="Horizontal">
                 <Slider x:Name="SpeedSlider" DockPanel.Dock="Left" Value="{Binding SliderValue, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" 
@@ -127,10 +133,10 @@
                 <TextBlock Text="Круговая диаграмма"/>
                 <ComboBox.Width>
                     <MultiBinding Converter="{converters:ArithmeticConverter}"
-                                      ConverterParameter="{x:Static converters:ArithmeticConverter+Operators.Division}">
+                                  ConverterParameter="{x:Static converters:ArithmeticConverter+Operators.Division}">
                         <MultiBinding.Bindings>
                             <Binding Path="ActualWidth" 
-                                         RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type StackPanel}}"/>
+                                     RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type StackPanel}}"/>
                             <Binding>
                                 <Binding.Source>
                                     <system:Double>
@@ -142,6 +148,54 @@
                     </MultiBinding>
                 </ComboBox.Width>
             </ComboBox>
+        </StackPanel>
+
+        <StackPanel Grid.Column="2" Orientation="Vertical">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="Height">
+                        <Setter.Value>
+                            <MultiBinding Converter="{converters:ArithmeticConverter}"
+                                          ConverterParameter="{x:Static converters:ArithmeticConverter+Operators.Division}">
+                                <MultiBinding.Bindings>
+                                    <Binding Path="ActualHeight"
+                                             RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type StackPanel}}"/>
+                                    <Binding>
+                                        <Binding.Source>
+                                            <system:Double>
+                                                2.0
+                                            </system:Double>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding.Bindings>
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Width">
+                        <Setter.Value>
+                            <MultiBinding Converter="{converters:ArithmeticConverter}"
+                                          ConverterParameter="{x:Static converters:ArithmeticConverter+Operators.Division}">
+                                <MultiBinding.Bindings>
+                                    <Binding Path="ActualWidth"
+                                             RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type StackPanel}}"/>
+                                    <Binding>
+                                        <Binding.Source>
+                                            <system:Double>
+                                                1.5
+                                            </system:Double>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding.Bindings>
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </StackPanel.Resources>
+            <Button Content="Начать сортировку" Command="{Binding StartSortCommand}"
+                    IsEnabled="{Binding PauseEnabled, Mode=OneWay}"/>
+            <Button Command="{Binding PauseCommand}" 
+                    Content="{Binding PauseResumeContent, Mode=OneWay, Converter={converters:PauseOrResumeToStringConverter}}"/>
         </StackPanel>
     </Grid>
 </Window>

@@ -13,7 +13,7 @@ namespace Semeshkin.WPF.MVVM.Converters
         {
             if (!(value is TypesOfButtons res))
             {
-                throw new ArgumentException($"Type of  is not {typeof(TypesOfButtons).FullName}", nameof(value));
+                throw new ArgumentException($"Type of value is not {typeof(TypesOfButtons).FullName}", nameof(value));
             }
 
             if (value == DependencyProperty.UnsetValue)

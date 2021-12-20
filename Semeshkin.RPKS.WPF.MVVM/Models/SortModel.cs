@@ -3,23 +3,36 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Semeshkin.RPKS.WPF.MVVM.Models
 {
+    public enum SortType
+    {
+        lox,
+        mox
+    }
+
+    public class ItemModel
+    {
+        public int Value { get; set; }
+        public Brush ValueColor { get; set; }
+    }
+
     public sealed class SortModel
     {
         #region Data
 
-        private ObservableCollection<int> _myValues = new ObservableCollection<int>();
-        private ObservableCollection<int> _myValuesCopy;
+        private ObservableCollection<ItemModel> _myValues = new ObservableCollection<ItemModel>();
+        private ObservableCollection<ItemModel> _myValuesCopy;
         private StringBuilder _text;
-        public readonly ReadOnlyObservableCollection<int> MyValues;
+        public readonly ReadOnlyObservableCollection<ItemModel> MyValues;
 
         #endregion
 
         public SortModel()
         {
-            MyValues = new ReadOnlyObservableCollection<int>(_myValues);
+            MyValues = new ReadOnlyObservableCollection<ItemModel>(_myValues);
         }
 
         #region Methods
@@ -40,7 +53,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.Models
                 index_2 = rand.Next(0, _myValuesCopy.Count);
             }
 
-            int temp = _myValuesCopy[index_1];
+            ItemModel temp = _myValuesCopy[index_1];
             _myValuesCopy[index_1] = _myValuesCopy[index_2];
             _myValuesCopy[index_2] = temp;
 
@@ -48,7 +61,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.Models
 
             for (int i = 0; i < _myValuesCopy.Count; i++)
             {
-                _text = _text.Append(_myValuesCopy[i]).Append(' ');
+                _text = _text.Append(_myValuesCopy[i].Value).Append(' ');
             }
 
             return _text;
@@ -61,11 +74,11 @@ namespace Semeshkin.RPKS.WPF.MVVM.Models
 
             for (int i = 1; i < length + 1; i++)
             {
-                _myValues.Add(i);
+                _myValues.Add(new ItemModel { Value = i, ValueColor = Brushes.Green });
                 _text = _text.Append(i).Append(' ');
             }
 
-            _myValuesCopy = new ObservableCollection<int>(_myValues);
+            _myValuesCopy = new ObservableCollection<ItemModel>(_myValues);
             return _text;
         }
 
@@ -77,6 +90,53 @@ namespace Semeshkin.RPKS.WPF.MVVM.Models
             {
                 _myValues.Add(_myValuesCopy[i]);
             }
+        }
+
+        public void ChangeColor(int i, int j, Brush color)
+        {
+            _myValues[i].ValueColor = color;
+            _myValues[j].ValueColor = color;
+        }
+
+        public void ChangeColor(int i, Brush color)
+        {
+            _myValues[i].ValueColor = color;
+        }
+
+        public void Swap(int i, int j, bool update)
+        {
+            if (update)
+            {
+                var temp = _myValues[j];
+                _myValues[j] = _myValues[i];
+                _myValues[i] = temp;
+            }
+            else
+            {
+                var temp = _myValues[j];
+                _myValues[j] = _myValues[i];
+                _myValues[i] = temp;
+                temp = _myValues[j];
+                _myValues[j] = _myValues[i];
+                _myValues[i] = temp;
+            }
+        }
+
+        public void Add(int index, int num)
+        {
+            _myValues[index].Value = num;
+        }
+
+        public StringBuilder GetText()
+        {
+            _text = new StringBuilder(_myValues.Count);
+
+            for (int i = 0; i < _myValues.Count; i++)
+            {
+                _text = _text.Append(_myValues[i].Value).Append(' ');
+            }
+
+            return _text;
         }
 
         #endregion
