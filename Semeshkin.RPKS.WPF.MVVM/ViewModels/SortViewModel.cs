@@ -25,7 +25,8 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         private int _sliderValue = 0;
         private bool _pauseEnabled = true;
         private int _selectedIndex;
-        private bool _diagramIsVisible = false;
+        private bool _gistIsEnabled = false;
+        private bool _circleIsEnabled = true;
         private PauseOrResume _pauseResumeContent = PauseOrResume.Pause;
         private Dispatcher _dispatcher;
         private StringBuilder _arrayText = new StringBuilder();
@@ -35,6 +36,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         private ICommand _refreshArrayCommand;
         private ICommand _startSortCommand;
         private ICommand _pauseCommand;
+        private ICommand _selectDiagramCommand;
 
 
         private readonly object lock_obj = new object();
@@ -59,21 +61,31 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         public ICommand RefreshArrayCommand => _refreshArrayCommand ??= new RelayCommand(_ => RefreshArray(), _ => CanRefreshArray());
         public ICommand StartSortCommand => _startSortCommand ??= new RelayCommand(_ => StartSort());
         public ICommand PauseCommand => _pauseCommand ??= new RelayCommand(_ => Pause());
-
-        public ICommand 
+        public ICommand SelectDiagramCommand => _selectDiagramCommand ??= new RelayCommand(_ => SelectDiagram());
 
 
         public NumericUpDownViewModel NumericUpDownViewModel => _numericUpDownViewModel ??= new NumericUpDownViewModel();
 
         public string ArrayText => _arrayText.ToString();
 
-        public bool DiagramIsVisible
+        public bool CircleIsEnabled
         {
-            get => _diagramIsVisible;
+            get => _circleIsEnabled;
             set
             {
-                _diagramIsVisible = value;
-                OnPropertiesChanged(nameof(DiagramIsVisible));
+                _circleIsEnabled = value;
+                OnPropertyChanged(nameof(CircleIsEnabled));
+            }
+
+        }
+
+        public bool GistIsEnabled
+        {
+            get => _gistIsEnabled;
+            set
+            {
+                _gistIsEnabled = value;
+                OnPropertyChanged(nameof(GistIsEnabled));
             }
 
         }
@@ -137,7 +149,20 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
 
         #region Methods
 
-  
+        private void SelectDiagram()
+        {
+            if (_gistIsEnabled)
+            {
+                GistIsEnabled = false;
+                CircleIsEnabled = true;
+            }
+            else
+            {
+                GistIsEnabled = true;
+                CircleIsEnabled = false;
+            }
+        }
+
         private async void StartSort()
         {
             for (int i = 1; i < MyCollection.Count; i++)

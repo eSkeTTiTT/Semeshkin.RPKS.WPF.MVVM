@@ -11,7 +11,7 @@ namespace Semeshkin.WPF.MVVM.Converters
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (bool)value ? Visibility.Visible : Visibility.Hidden;
+            return (bool)value ? Visibility.Hidden : Visibility.Visible;
         }
     }
 }

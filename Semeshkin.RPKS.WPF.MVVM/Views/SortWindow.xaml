@@ -55,7 +55,7 @@
         <ScrollViewer Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Disabled"
-                      Margin="13" x:Name="gistagrama" Visibility="{Binding GistagramIsVisible, Converter={converters:DiagramIsVisibilityConverter}}">
+                      Margin="13" x:Name="gistagrama" Visibility="{Binding GistIsEnabled, Converter={converters:DiagramIsVisibilityConverter}}">
             <ItemsControl ItemsSource="{Binding MyCollection}" >
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -74,7 +74,7 @@
         </ScrollViewer>
 
         <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2"        
-                      Margin="13" x:Name="diagrama" Visibility="{Binding DiagramIsVisible, Converter={converters:DiagramIsVisibilityConverter}}">
+                      Margin="13" x:Name="diagrama" Visibility="{Binding CircleIsEnabled, Converter={converters:DiagramIsVisibilityConverter}}">
             <ItemsControl ItemsSource="{Binding MyCollectionPath}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -197,8 +197,13 @@
             </ComboBox>
             <Label Content="Выбрать тип отображения"/>
             <Menu>
-                <MenuItem Header="Гистограмма" IsEnabled="{Binding DiagramIsVisible}"/>
-                <MenuItem Header="Круговая диаграмма" IsEnabled="{Binding DiagramIsVisible}"/>
+                <Menu.Resources>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="Command" Value="{Binding SelectDiagramCommand}" />
+                    </Style>
+                </Menu.Resources>
+                <MenuItem Header="Гистограмма" IsEnabled="{Binding GistIsEnabled}"/>
+                <MenuItem Header="Круговая диаграмма" IsEnabled="{Binding CircleIsEnabled}"/>
             </Menu>
         </StackPanel>
 
