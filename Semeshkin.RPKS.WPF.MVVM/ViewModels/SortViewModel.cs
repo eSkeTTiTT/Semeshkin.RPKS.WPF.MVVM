@@ -25,7 +25,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         {
             Inserts,
             Selects,
-            Discharges,
+            Radix,
             Merges,
             Pyramid
         }
@@ -159,7 +159,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                 {
                     0 => SortType.Inserts,
                     1 => SortType.Selects,
-                    2 => SortType.Discharges,
+                    2 => SortType.Radix,
                     3 => SortType.Merges,
                     4 => SortType.Pyramid,
                     _ => throw new ArgumentException()
@@ -194,6 +194,12 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
             {
                 case SortType.Inserts:
                     await InsertsSort();
+                    break;
+                case SortType.Selects:
+                    await SelectsSort();
+                    break;
+                case SortType.Radix:
+                    await RadixSort();
                     break;
                 default:
                     throw new ArgumentException();
@@ -237,8 +243,119 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
             return true;
         }
 
-        #region Sorts
+        public int GetMax()
+        {
 
+            int mx = _model.MyValues[0].Value;
+
+            for (int i = 1; i < _model.MyValues.Count; i++)
+
+                if (_model.MyValues[i].Value > mx)
+
+                    mx = _model.MyValues[i].Value;
+
+            return mx;
+
+        }
+
+
+        public async Task CountSort(int exp)
+        {
+
+            int[] output = new int[_model.MyValues.Count];
+            int i;
+            var copy = new ObservableCollection<ItemModel>(_model.MyValues);
+            int[] count = new int[10];
+            int index;
+
+            if (copy.Count <= 1) return;
+            for (i = 0; i < 10; i++)
+                count[i] = 0;
+
+            for (i = 0; i < copy.Count; i++)
+                count[(copy[i].Value / exp) % 10]++;
+
+            for (i = 1; i < 10; i++)
+                count[i] += count[i - 1];
+
+
+
+            // Создаем выходной массив
+
+            for (i = copy.Count - 1; i >= 0; i--)
+            {
+                
+                index = count[(copy[i].Value / exp) % 10] - 1;
+                output[index] = copy[i].Value;
+                _model.ChangeColor(i, Brushes.Red);
+                _model.ChangeColor(index, Brushes.Red);
+                _model.Swap(i, copy.Count - 1, false);
+                _model.Swap(index, copy.Count - 1, false);
+                await Task.Delay(105 - _sliderValue);
+
+                _model.Set(index, copy[i]);
+                _model.ChangeColor(i, Brushes.Green);
+                _model.ChangeColor(index, Brushes.Green);
+                _model.Swap(i, copy.Count - 1, false);
+                _model.Swap(index, copy.Count - 1, false);
+                await Task.Delay(105 - _sliderValue);
+
+                count[(copy[i].Value / exp) % 10]--;
+
+            }
+
+
+        }
+
+        #region Sorts
+        public async Task RadixSort()
+        {
+            int m = GetMax();
+
+            for (int exp = 1; m / exp > 0; exp *= 10)
+                await CountSort(exp);
+
+            _arrayText = _model.GetText();
+            OnPropertyChanged(nameof(ArrayText));
+        }
+
+   
+        private async Task SelectsSort()
+        {
+            for (int i = 0; i < MyCollection.Count - 1; i++)
+            {
+                int min = i;
+                _model.ChangeColor(i, Brushes.Red);
+                _model.Swap(i, i + 1, false);
+                _model.ChangeColorPath(i, i + 1, true);
+                await Task.Delay(105 - _sliderValue);
+                for (int j = i + 1; j < MyCollection.Count; j++)
+                {
+                    _model.ChangeColor(j, Brushes.Red);
+                    _model.Swap(j, j - 1, false);
+                    _model.ChangeColorPath(j, j - 1, true);
+                    await Task.Delay(105 - _sliderValue);
+                    if (MyCollection[j].Value < MyCollection[min].Value)
+                    {
+                        min = j;
+                    }
+                    _model.ChangeColor(j, Brushes.Green);
+                    _model.Swap(j - 1, j, false);
+                    _model.ChangeColorPath(j, j - 1, false);
+                    await Task.Delay(105 - _sliderValue);
+                }
+                _model.Swap(i, min, true);
+                _model.FillingArrayPath();
+                await Task.Delay(105 - _sliderValue);
+
+                _model.ChangeColor(i, Brushes.Green);
+                _model.Swap(i, _model.MyValues.Count - 1, false);
+                await Task.Delay(105 - _sliderValue);
+            }
+
+            _arrayText = _model.GetText();
+            OnPropertyChanged(nameof(ArrayText));
+        }
         private async Task InsertsSort()
         {
             for (int i = 1; i < MyCollection.Count; i++)

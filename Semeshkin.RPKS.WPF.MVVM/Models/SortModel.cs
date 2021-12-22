@@ -218,6 +218,10 @@ namespace Semeshkin.RPKS.WPF.MVVM.Models
             }
         }
 
+        public void Set(int index, ItemModel value)
+        {
+            _myValues[index] = value;
+        }
         public void Add(int index, int num)
         {
             _myValues[index].Value = num;
