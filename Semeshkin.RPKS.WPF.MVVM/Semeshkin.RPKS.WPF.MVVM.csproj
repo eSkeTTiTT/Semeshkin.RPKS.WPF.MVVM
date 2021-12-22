@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNetProjects.WpfToolkit.DataVisualization" Version="6.1.91" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Semeshkin.Wpf.Controls\Semeshkin.Wpf.Controls.csproj" />
     <ProjectReference Include="..\Semeshkin.WPF.MVVM.Core\Semeshkin.WPF.MVVM.Core.csproj" />
     <ProjectReference Include="..\Semeshkin.WPF.MVVM\Semeshkin.WPF.MVVM.csproj" />

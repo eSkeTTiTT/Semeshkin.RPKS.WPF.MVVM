@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNetProjects.WpfToolkit.DataVisualization" Version="6.1.91" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Semeshkin.WPF.MVVM\Semeshkin.WPF.MVVM.csproj" />
   </ItemGroup>
 
