@@ -10,11 +10,6 @@ using System.Windows.Shapes;
 
 namespace Semeshkin.RPKS.WPF.MVVM.Models
 {
-    public enum SortType
-    {
-        lox,
-        mox
-    }
 
     public class ItemModel
     {
@@ -56,11 +51,6 @@ namespace Semeshkin.RPKS.WPF.MVVM.Models
         }
 
         #region Methods
-
-        public async Task FillingArrayPathAsync()
-        {
-            await Task.Run(FillingArrayPath);
-        }
 
 
         public void FillingArrayPath()
@@ -113,6 +103,11 @@ namespace Semeshkin.RPKS.WPF.MVVM.Models
         public async Task<StringBuilder> RefreshArrayAsync()
         {
             return await Task.Run(RefreshArray);
+        }
+
+        public async Task FillingArrayPathAsync()
+        {
+            await Task.Run(FillingArrayPath);
         }
 
         public StringBuilder RefreshArray()

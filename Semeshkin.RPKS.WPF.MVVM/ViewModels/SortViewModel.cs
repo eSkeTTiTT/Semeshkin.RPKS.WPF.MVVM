@@ -19,6 +19,19 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
 {
     internal sealed class SortViewModel : ViewModelBase
     {
+        #region Data
+
+        public enum SortType
+        {
+            Inserts,
+            Selects,
+            Discharges,
+            Merges,
+            Pyramid
+        }
+
+        #endregion
+
         #region Fields
 
         private int _numericValue = 1;
@@ -27,6 +40,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         private int _selectedIndex;
         private bool _gistIsEnabled = false;
         private bool _circleIsEnabled = true;
+        private SortType _sortType;
         private PauseOrResume _pauseResumeContent = PauseOrResume.Pause;
         private Dispatcher _dispatcher;
         private StringBuilder _arrayText = new StringBuilder();
@@ -140,7 +154,17 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
             set
             {
                 _selectedIndex = value;
-                
+
+                _sortType = _selectedIndex switch
+                {
+                    0 => SortType.Inserts,
+                    1 => SortType.Selects,
+                    2 => SortType.Discharges,
+                    3 => SortType.Merges,
+                    4 => SortType.Pyramid,
+                    _ => throw new ArgumentException()
+                };
+
                 OnPropertyChanged(nameof(SelectedIndex));
             }
         }
@@ -163,7 +187,59 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
             }
         }
 
+
         private async void StartSort()
+        {
+            switch(_sortType)
+            {
+                case SortType.Inserts:
+                    await InsertsSort();
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+        private void Pause()
+        {
+            PauseResumeContent = _pauseResumeContent == PauseOrResume.Pause
+                                ? PauseOrResume.Resume
+                                : PauseOrResume.Pause;
+
+            PauseEnabled = _pauseResumeContent == PauseOrResume.Pause;
+        }
+
+        private async void RefreshArray()
+        {
+            for (int i = 0; i < _model.MyValues.Count; i++)
+            {
+                _arrayText = await _model.RefreshArrayAsync();
+                OnPropertyChanged(nameof(ArrayText));
+                await Task.Delay(105 - _sliderValue);
+            }
+            
+            _model.CopyToCurrent();
+        }
+
+        private bool CanRefreshArray()
+        {
+            return _model.MyValues.Count > 1;
+        }
+
+        private async void CreateArray()
+        {
+            _arrayText = await _model.CreateArray(_numericValue);
+            OnPropertyChanged(nameof(ArrayText));
+        }
+
+        private bool CanCreateArray()
+        {
+            return true;
+        }
+
+        #region Sorts
+
+        private async Task InsertsSort()
         {
             for (int i = 1; i < MyCollection.Count; i++)
             {
@@ -209,42 +285,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
             OnPropertyChanged(nameof(ArrayText));
         }
 
-        private void Pause()
-        {
-            PauseResumeContent = _pauseResumeContent == PauseOrResume.Pause
-                                ? PauseOrResume.Resume
-                                : PauseOrResume.Pause;
-
-            PauseEnabled = _pauseResumeContent == PauseOrResume.Pause;
-        }
-
-        private async void RefreshArray()
-        {
-            for (int i = 0; i < _model.MyValues.Count; i++)
-            {
-                _arrayText = await _model.RefreshArrayAsync();
-                OnPropertyChanged(nameof(ArrayText));
-                await Task.Delay(105 - _sliderValue);
-            }
-            
-            _model.CopyToCurrent();
-        }
-
-        private bool CanRefreshArray()
-        {
-            return _model.MyValues.Count > 1;
-        }
-
-        private async void CreateArray()
-        {
-            _arrayText = await _model.CreateArray(_numericValue);
-            OnPropertyChanged(nameof(ArrayText));
-        }
-
-        private bool CanCreateArray()
-        {
-            return true;
-        }
+        #endregion
 
         #endregion
     }

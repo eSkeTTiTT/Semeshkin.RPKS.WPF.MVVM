@@ -174,9 +174,12 @@
             <ComboBox HorizontalAlignment="Left" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
                 
                 <ComboBoxItem IsSelected="True">
-                    <TextBlock Text="Гистограмма"/>
+                    <TextBlock Text="Вставками"/>
                 </ComboBoxItem>
-                <TextBlock Text="Круговая диаграмма"/>
+                <TextBlock Text="Выбором"/>
+                <TextBlock Text="Поразрядная"/>
+                <TextBlock Text="Слиянием"/>
+                <TextBlock Text="Пирамидальная"/>
                 <ComboBox.Width>
                     <MultiBinding Converter="{converters:ArithmeticConverter}"
                                   ConverterParameter="{x:Static converters:ArithmeticConverter+Operators.Division}">
