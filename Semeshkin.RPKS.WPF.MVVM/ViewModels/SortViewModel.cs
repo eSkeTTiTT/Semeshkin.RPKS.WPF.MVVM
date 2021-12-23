@@ -14,6 +14,7 @@ using Semeshkin.WPF.MVVM.Data;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Linq;
 
 namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
 {
@@ -26,7 +27,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
             Inserts,
             Selects,
             Radix,
-            Merges,
+            Merge,
             Pyramid
         }
 
@@ -160,7 +161,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                     0 => SortType.Inserts,
                     1 => SortType.Selects,
                     2 => SortType.Radix,
-                    3 => SortType.Merges,
+                    3 => SortType.Merge,
                     4 => SortType.Pyramid,
                     _ => throw new ArgumentException()
                 };
@@ -200,6 +201,12 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                     break;
                 case SortType.Radix:
                     await RadixSort();
+                    break;
+                case SortType.Merge:
+                    await MergeSort();
+                    break;
+                case SortType.Pyramid:
+                    await PyramidSort();
                     break;
                 default:
                     throw new ArgumentException();
@@ -259,7 +266,160 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         }
 
 
-        public async Task CountSort(int exp)
+
+
+
+
+
+
+        #region Sorts
+
+        private async Task<Int32> Add2Pyramid(Int32 i, Int32 N)
+        {
+            Int32 imax;
+            if ((2 * i + 2) < N)
+            {
+                if (_model.MyValues[2 * i + 1].Value < _model.MyValues[2 * i + 2].Value) imax = 2 * i + 2;
+                else imax = 2 * i + 1;
+            }
+            else imax = 2 * i + 1;
+            if (imax >= N) return i;
+            if (_model.MyValues[i].Value < _model.MyValues[imax].Value)
+            {
+                _model.ChangeColor(i, Brushes.Red);
+                _model.ChangeColor(imax, Brushes.Red);
+                _model.Swap(i, imax, false);
+                _model.ChangeColorPath(i, imax, true);
+                _model.ChangeColorPath(imax, i, true);
+                await Task.Delay(105 - _sliderValue);
+
+                _model.Swap(i, imax, true);
+                _model.FillingArrayPath();
+
+                _model.ChangeColor(i, Brushes.Green);
+                _model.ChangeColor(imax, Brushes.Green);
+                _model.Swap(i, imax, false);
+                await Task.Delay(105 - _sliderValue);
+
+                if (imax < N / 2) i = imax;
+            }
+            return i;
+        }
+
+        private async Task PyramidSort()
+        {
+            //step 1: building the pyramid
+            for (Int32 i = _model.MyValues.Count / 2 - 1; i >= 0; --i)
+            {
+                long prev_i = i;
+                i = await Add2Pyramid(i, _model.MyValues.Count);
+                if (prev_i != i) ++i;
+            }
+
+            //step 2: sorting
+            for (Int32 k = _model.MyValues.Count - 1; k > 0; --k)
+            {
+                _model.ChangeColor(0, Brushes.Red);
+                _model.ChangeColor(k, Brushes.Red);
+                _model.Swap(0, k, false);
+                _model.ChangeColorPath(0, k, true);
+                _model.ChangeColorPath(k, 0, true);
+                await Task.Delay(105 - _sliderValue);
+
+                _model.Swap(0, k, true);
+                _model.FillingArrayPath();
+
+                _model.ChangeColor(0, Brushes.Green);
+                _model.ChangeColor(k, Brushes.Green);
+                _model.Swap(0, k, false);
+                await Task.Delay(105 - _sliderValue);
+
+                Int32 i = 0, prev_i = -1;
+                while (i != prev_i)
+                {
+                    prev_i = i;
+                    i = await Add2Pyramid(i, k);
+                }
+            }
+
+            _arrayText = _model.GetText();
+            OnPropertyChanged(nameof(ArrayText));
+        }
+        static Int32[] MergeSort(Int32[] array)
+        {
+            if (array.Length == 1)
+            {
+                return array;
+            }
+
+            Int32 middle = array.Length / 2;
+            return Merge(MergeSort(array.Take(middle).ToArray()), MergeSort(array.Skip(middle).ToArray()));
+        }
+
+        static Int32[] Merge(Int32[] mass1, Int32[] mass2)
+        {
+            Int32 a = 0, b = 0;
+            Int32[] merged = new int[mass1.Length + mass2.Length];
+            for (Int32 i = 0; i < mass1.Length + mass2.Length; i++)
+            {
+                if (b < mass2.Length && a < mass1.Length)
+                    if (mass1[a] > mass2[b])
+                        merged[i] = mass2[b++];
+                    else //if int go for
+                        merged[i] = mass1[a++];
+                else
+                    if (b < mass2.Length)
+                    merged[i] = mass2[b++];
+                else
+                    merged[i] = mass1[a++];
+            }
+            return merged;
+        }
+
+        private async Task MergeSort()
+        {
+            if (_model.MyValues.Count <= 1) return;
+            int[] array = new int[_model.MyValues.Count];
+            for (int i = 0; i < _model.MyValues.Count; i++)
+            {
+                array[i] = _model.MyValues[i].Value;
+            }
+            array = MergeSort(array);
+            for (int i = 0; i < _model.MyValues.Count; i++)
+            {
+                _model.ChangeColor(i, Brushes.Red);
+                if (i == 0)
+                {
+                    _model.ChangeColorPath(i, i + 1, true);
+                    _model.Swap(i, i + 1, false);
+                }
+                else
+                {
+                    _model.ChangeColorPath(i, i - 1, true);
+                    _model.Swap(i, i - 1, false);
+                }
+                await Task.Delay(105 - _sliderValue);
+
+                _model.MyValues[i].Value = array[i];
+                _model.FillingArrayPath();
+
+                _model.ChangeColor(i, Brushes.Green);
+                if (i == 0)
+                {
+                    _model.Swap(i, i + 1, false);
+                }
+                else
+                {
+                    _model.Swap(i, i - 1, false);
+                }
+                await Task.Delay(105 - _sliderValue);
+            }
+
+            _arrayText = _model.GetText();
+            OnPropertyChanged(nameof(ArrayText));
+        }
+
+        private async Task CountSort(int exp)
         {
 
             int[] output = new int[_model.MyValues.Count];
@@ -268,7 +428,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
             int[] count = new int[10];
             int index;
 
-            if (copy.Count <= 1) return;
+
             for (i = 0; i < 10; i++)
                 count[i] = 0;
 
@@ -279,25 +439,65 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                 count[i] += count[i - 1];
 
 
-
-            // Создаем выходной массив
-
             for (i = copy.Count - 1; i >= 0; i--)
             {
-                
+
                 index = count[(copy[i].Value / exp) % 10] - 1;
                 output[index] = copy[i].Value;
                 _model.ChangeColor(i, Brushes.Red);
                 _model.ChangeColor(index, Brushes.Red);
-                _model.Swap(i, copy.Count - 1, false);
-                _model.Swap(index, copy.Count - 1, false);
+                if (i == 0)
+                {
+                    _model.Swap(i, i + 1, false);
+                    _model.ChangeColorPath(i, i + 1, true);
+                }
+                else
+                {
+                    _model.Swap(i, i - 1, false);
+                    _model.ChangeColorPath(i, i - 1, true);
+                }
+
+                if (index == 0)
+                {
+                    _model.Swap(index, index + 1, false);
+                    _model.ChangeColorPath(index, index + 1, true);
+                }
+                else
+                {
+                    _model.Swap(index, index - 1, false);
+                    _model.ChangeColorPath(index, index - 1, true);
+                }
+                await Task.Delay(105 - _sliderValue);
+
+                _model.ChangeColor(i, Brushes.Green);
+                _model.ChangeColor(index, Brushes.Green);
+
+                if (i == 0)
+                {
+                    _model.Swap(i, i + 1, false);
+                    _model.ChangeColorPath(i, i + 1, false);
+                }
+                else
+                {
+                    _model.Swap(i, i - 1, false);
+                    _model.ChangeColorPath(i, i - 1, false);
+                }
+
+                if (index == 0)
+                {
+                    _model.Swap(index, index + 1, false);
+                    _model.ChangeColorPath(index, index + 1, false);
+                }
+                else
+                {
+                    _model.Swap(index, index - 1, false);
+                    _model.ChangeColorPath(index, index - 1, false);
+                }
                 await Task.Delay(105 - _sliderValue);
 
                 _model.Set(index, copy[i]);
-                _model.ChangeColor(i, Brushes.Green);
-                _model.ChangeColor(index, Brushes.Green);
-                _model.Swap(i, copy.Count - 1, false);
-                _model.Swap(index, copy.Count - 1, false);
+                _model.FillingArrayPath();
+
                 await Task.Delay(105 - _sliderValue);
 
                 count[(copy[i].Value / exp) % 10]--;
@@ -306,14 +506,15 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
 
 
         }
-
-        #region Sorts
-        public async Task RadixSort()
+        private async Task RadixSort()
         {
+            if (_model.MyValues.Count <= 1) return;
             int m = GetMax();
+            
 
             for (int exp = 1; m / exp > 0; exp *= 10)
                 await CountSort(exp);
+            
 
             _arrayText = _model.GetText();
             OnPropertyChanged(nameof(ArrayText));
@@ -345,9 +546,12 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                     await Task.Delay(105 - _sliderValue);
                 }
                 _model.Swap(i, min, true);
+                _model.ChangeColor(min, Brushes.Green);
+                _model.Swap(min, _model.MyValues.Count - 1, false);
                 _model.FillingArrayPath();
                 await Task.Delay(105 - _sliderValue);
 
+                _model.ChangeColor(_model.MyValues.Count - 1, Brushes.Green);
                 _model.ChangeColor(i, Brushes.Green);
                 _model.Swap(i, _model.MyValues.Count - 1, false);
                 await Task.Delay(105 - _sliderValue);
