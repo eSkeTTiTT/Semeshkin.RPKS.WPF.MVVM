@@ -37,10 +37,11 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
 
         private int _numericValue = 1;
         private int _sliderValue = 0;
-        private bool _pauseEnabled = true;
         private int _selectedIndex;
         private bool _gistIsEnabled = false;
         private bool _circleIsEnabled = true;
+        private bool _menuAndSliderIsEnabled = true;
+        private bool _numericAndSortsIsEnabled = true;
         private SortType _sortType;
         private PauseOrResume _pauseResumeContent = PauseOrResume.Pause;
         private Dispatcher _dispatcher;
@@ -53,6 +54,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         private ICommand _pauseCommand;
         private ICommand _selectDiagramCommand;
 
+        private bool IsPauseActive = false;
 
         private readonly object lock_obj = new object();
         private readonly object lock_path = new object();
@@ -94,6 +96,26 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
 
         }
 
+        public bool MenuAndSliderIsEnabled
+        {
+            get => _menuAndSliderIsEnabled;
+            set
+            {
+                _menuAndSliderIsEnabled = value;
+                OnPropertyChanged(nameof(MenuAndSliderIsEnabled));
+            }
+        }
+
+        public bool NumericAndSortsIsEnabled
+        {
+            get => _numericAndSortsIsEnabled;
+            set
+            {
+                _numericAndSortsIsEnabled = value;
+                OnPropertyChanged(nameof(NumericAndSortsIsEnabled));
+            }
+        }
+
         public bool GistIsEnabled
         {
             get => _gistIsEnabled;
@@ -113,16 +135,6 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
             {
                 _pauseResumeContent = value;
                 OnPropertyChanged(nameof(PauseResumeContent));
-            }
-        }
-
-        public bool PauseEnabled
-        {
-            get => _pauseEnabled;
-            set
-            {
-                _pauseEnabled = value;
-                OnPropertyChanged(nameof(PauseEnabled));
             }
         }
 
@@ -174,6 +186,14 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
 
         #region Methods
 
+        private void WaitIsPauseActive()
+        {
+            while (IsPauseActive)
+            {
+
+            }
+        }
+
         private void SelectDiagram()
         {
             if (_gistIsEnabled)
@@ -189,28 +209,34 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         }
 
 
-        private async void StartSort()
+        private async Task StartSort()
         {
-            switch(_sortType)
+            NumericAndSortsIsEnabled = false;
+            MenuAndSliderIsEnabled = false;
+
+            switch (_sortType)
             {
                 case SortType.Inserts:
-                    await InsertsSort();
+                    await Task.Run(InsertsSort);
                     break;
                 case SortType.Selects:
-                    await SelectsSort();
+                    await Task.Run(SelectsSort);
                     break;
                 case SortType.Radix:
-                    await RadixSort();
+                    await Task.Run(RadixSort);
                     break;
                 case SortType.Merge:
-                    await MergeSort();
+                    await Task.Run(MergeSort);
                     break;
                 case SortType.Pyramid:
-                    await PyramidSort();
+                    await Task.Run(PyramidSort);
                     break;
                 default:
                     throw new ArgumentException();
             }
+
+            NumericAndSortsIsEnabled = true;
+            MenuAndSliderIsEnabled = true;
         }
 
         private void Pause()
@@ -219,7 +245,9 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                                 ? PauseOrResume.Resume
                                 : PauseOrResume.Pause;
 
-            PauseEnabled = _pauseResumeContent == PauseOrResume.Pause;
+            IsPauseActive = IsPauseActive == false;
+
+            MenuAndSliderIsEnabled = _pauseResumeContent == PauseOrResume.Resume;
         }
 
         private async void RefreshArray()
@@ -265,25 +293,25 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
 
         }
 
-
-
-
-
-
-
-
         #region Sorts
 
-        private async Task<Int32> Add2Pyramid(Int32 i, Int32 N)
+        private async Task<int> Add2Pyramid(int i, int N)
         {
-            Int32 imax;
+            int imax;
             if ((2 * i + 2) < N)
             {
-                if (_model.MyValues[2 * i + 1].Value < _model.MyValues[2 * i + 2].Value) imax = 2 * i + 2;
-                else imax = 2 * i + 1;
+                imax = _model.MyValues[2 * i + 1].Value < _model.MyValues[2 * i + 2].Value ? (2 * i + 2) : (2 * i + 1);
             }
-            else imax = 2 * i + 1;
-            if (imax >= N) return i;
+            else
+            {
+                imax = 2 * i + 1;
+            }
+
+            if (imax >= N)
+            {
+                return i;
+            }
+
             if (_model.MyValues[i].Value < _model.MyValues[imax].Value)
             {
                 _model.ChangeColor(i, Brushes.Red);
@@ -292,6 +320,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                 _model.ChangeColorPath(i, imax, true);
                 _model.ChangeColorPath(imax, i, true);
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
 
                 _model.Swap(i, imax, true);
                 _model.FillingArrayPath();
@@ -300,8 +329,12 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                 _model.ChangeColor(imax, Brushes.Green);
                 _model.Swap(i, imax, false);
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
 
-                if (imax < N / 2) i = imax;
+                if (imax < N / 2)
+                {
+                    i = imax;
+                }
             }
             return i;
         }
@@ -309,7 +342,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         private async Task PyramidSort()
         {
             //step 1: building the pyramid
-            for (Int32 i = _model.MyValues.Count / 2 - 1; i >= 0; --i)
+            for (int i = _model.MyValues.Count / 2 - 1; i >= 0; --i)
             {
                 long prev_i = i;
                 i = await Add2Pyramid(i, _model.MyValues.Count);
@@ -317,7 +350,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
             }
 
             //step 2: sorting
-            for (Int32 k = _model.MyValues.Count - 1; k > 0; --k)
+            for (int k = _model.MyValues.Count - 1; k > 0; --k)
             {
                 _model.ChangeColor(0, Brushes.Red);
                 _model.ChangeColor(k, Brushes.Red);
@@ -325,6 +358,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                 _model.ChangeColorPath(0, k, true);
                 _model.ChangeColorPath(k, 0, true);
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
 
                 _model.Swap(0, k, true);
                 _model.FillingArrayPath();
@@ -333,8 +367,9 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                 _model.ChangeColor(k, Brushes.Green);
                 _model.Swap(0, k, false);
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
 
-                Int32 i = 0, prev_i = -1;
+                int i = 0, prev_i = -1;
                 while (i != prev_i)
                 {
                     prev_i = i;
@@ -345,22 +380,22 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
             _arrayText = _model.GetText();
             OnPropertyChanged(nameof(ArrayText));
         }
-        static Int32[] MergeSort(Int32[] array)
+        static int[] MergeSort(int[] array)
         {
             if (array.Length == 1)
             {
                 return array;
             }
 
-            Int32 middle = array.Length / 2;
+            int middle = array.Length / 2;
             return Merge(MergeSort(array.Take(middle).ToArray()), MergeSort(array.Skip(middle).ToArray()));
         }
 
-        static Int32[] Merge(Int32[] mass1, Int32[] mass2)
+        static int[] Merge(int[] mass1, int[] mass2)
         {
-            Int32 a = 0, b = 0;
-            Int32[] merged = new int[mass1.Length + mass2.Length];
-            for (Int32 i = 0; i < mass1.Length + mass2.Length; i++)
+            int a = 0, b = 0;
+            int[] merged = new int[mass1.Length + mass2.Length];
+            for (int i = 0; i < mass1.Length + mass2.Length; i++)
             {
                 if (b < mass2.Length && a < mass1.Length)
                     if (mass1[a] > mass2[b])
@@ -399,6 +434,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                     _model.Swap(i, i - 1, false);
                 }
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
 
                 _model.MyValues[i].Value = array[i];
                 _model.FillingArrayPath();
@@ -413,6 +449,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                     _model.Swap(i, i - 1, false);
                 }
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
             }
 
             _arrayText = _model.GetText();
@@ -468,6 +505,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                     _model.ChangeColorPath(index, index - 1, true);
                 }
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
 
                 _model.ChangeColor(i, Brushes.Green);
                 _model.ChangeColor(index, Brushes.Green);
@@ -494,11 +532,13 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                     _model.ChangeColorPath(index, index - 1, false);
                 }
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
 
                 _model.Set(index, copy[i]);
                 _model.FillingArrayPath();
 
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
 
                 count[(copy[i].Value / exp) % 10]--;
 
@@ -530,12 +570,14 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                 _model.Swap(i, i + 1, false);
                 _model.ChangeColorPath(i, i + 1, true);
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
                 for (int j = i + 1; j < MyCollection.Count; j++)
                 {
                     _model.ChangeColor(j, Brushes.Red);
                     _model.Swap(j, j - 1, false);
                     _model.ChangeColorPath(j, j - 1, true);
                     await Task.Delay(105 - _sliderValue);
+                    WaitIsPauseActive();
                     if (MyCollection[j].Value < MyCollection[min].Value)
                     {
                         min = j;
@@ -544,17 +586,20 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                     _model.Swap(j - 1, j, false);
                     _model.ChangeColorPath(j, j - 1, false);
                     await Task.Delay(105 - _sliderValue);
+                    WaitIsPauseActive();
                 }
                 _model.Swap(i, min, true);
                 _model.ChangeColor(min, Brushes.Green);
                 _model.Swap(min, _model.MyValues.Count - 1, false);
                 _model.FillingArrayPath();
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
 
                 _model.ChangeColor(_model.MyValues.Count - 1, Brushes.Green);
                 _model.ChangeColor(i, Brushes.Green);
                 _model.Swap(i, _model.MyValues.Count - 1, false);
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
             }
 
             _arrayText = _model.GetText();
@@ -564,24 +609,30 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
         {
             for (int i = 1; i < MyCollection.Count; i++)
             {
+                WaitIsPauseActive();
+
                 int key = MyCollection[i].Value;
                 int j = i;
                 _model.ChangeColor(j, Brushes.Red);
                 _model.Swap(j - 1, j, false);
                 _model.ChangeColorPath(j, j - 1, true);
                 await Task.Delay(105 - _sliderValue);
+                WaitIsPauseActive();
                 while ((j >= 1) && (MyCollection[j - 1].Value > key))
                 {
                     _model.ChangeColor(j - 1, Brushes.Red);
                     _model.Swap(j - 1, j, false);
                     _model.ChangeColorPath(j - 1, j, true);
                     await Task.Delay(105 - _sliderValue);
+                    WaitIsPauseActive();
                     _model.Swap(j - 1, j, true);
                     _model.FillingArrayPath();
                     await Task.Delay(105 - _sliderValue);
+                    WaitIsPauseActive();
                     _model.ChangeColor(j, Brushes.Green);
                     _model.Swap(j - 1, j, false);
                     await Task.Delay(105 - _sliderValue);
+                    WaitIsPauseActive();
                     j--;
                 }
 
@@ -599,7 +650,7 @@ namespace Semeshkin.RPKS.WPF.MVVM.ViewModels
                     _model.ChangeColorPath(j, j - 1, false);
                 }
                 await Task.Delay(105 - _sliderValue);
-
+                WaitIsPauseActive();
             }
 
             _arrayText = _model.GetText();

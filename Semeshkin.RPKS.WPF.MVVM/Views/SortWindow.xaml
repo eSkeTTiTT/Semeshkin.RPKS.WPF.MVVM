@@ -115,9 +115,7 @@
         </Grid>
 
         <StackPanel x:Name="NumericStack"
-                    IsEnabled="{Binding PauseEnabled, Mode=OneWay}">
-
-
+                    IsEnabled="{Binding NumericAndSortsIsEnabled}">
             <control:NumericUpDown x:Name="Numeric" Value="{Binding NumericValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                IncrementStepCommand="{Binding NumericUpDownViewModel.IncrementStepCommand}"
                                DecrementStepCommand="{Binding NumericUpDownViewModel.DecrementStepCommand}"
@@ -145,9 +143,9 @@
         </DockPanel>
 
         <StackPanel x:Name="SettingsStack" Grid.Column="1" Orientation="Vertical" Margin="10,0,0,0"
-                    IsEnabled="{Binding PauseEnabled, Mode=OneWay}">
-            <Label Content="Задать скорость отображения" />
-            <StackPanel Orientation="Horizontal">
+                    IsEnabled="{Binding CanEnabled, Mode=OneWay}">
+            <Label Content="Задать скорость отображения" IsEnabled="{Binding MenuAndSliderIsEnabled}"/>
+            <StackPanel Orientation="Horizontal" IsEnabled="{Binding MenuAndSliderIsEnabled}">
                 <Slider x:Name="SpeedSlider" DockPanel.Dock="Left" Value="{Binding SliderValue, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" 
                 Minimum="0" Maximum="100" SelectionStart="0" IsSelectionRangeEnabled="True"
                 SelectionEnd="{Binding Value, RelativeSource={RelativeSource Self}}">
@@ -170,9 +168,9 @@
                 </Slider>
                 <TextBlock Text="{Binding SliderValue, Mode=OneWay}" />
             </StackPanel>
-            <Label Content="Выбрать тип отображения"/>
-            <ComboBox HorizontalAlignment="Left" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
-                
+            <Label Content="Выбрать тип отображения" IsEnabled="{Binding NumericAndSortsIsEnabled}"/>
+            <ComboBox HorizontalAlignment="Left" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"
+                      IsEnabled="{Binding NumericAndSortsIsEnabled}">
                 <ComboBoxItem IsSelected="True">
                     <TextBlock Text="Вставками"/>
                 </ComboBoxItem>
@@ -198,8 +196,8 @@
                 </ComboBox.Width>
 
             </ComboBox>
-            <Label Content="Выбрать тип отображения"/>
-            <Menu>
+            <Label Content="Выбрать тип отображения" IsEnabled="{Binding MenuAndSliderIsEnabled}"/>
+            <Menu IsEnabled="{Binding MenuAndSliderIsEnabled}">
                 <Menu.Resources>
                     <Style TargetType="{x:Type MenuItem}">
                         <Setter Property="Command" Value="{Binding SelectDiagramCommand}" />
@@ -253,9 +251,22 @@
                 </Style>
             </StackPanel.Resources>
             <Button Content="Начать сортировку" Command="{Binding StartSortCommand}"
-                    IsEnabled="{Binding PauseEnabled, Mode=OneWay}"/>
+                    IsEnabled="{Binding NumericAndSortsIsEnabled}"/>
             <Button Command="{Binding PauseCommand}" 
-                    Content="{Binding PauseResumeContent, Mode=OneWay, Converter={converters:PauseOrResumeToStringConverter}}"/>
+                    Content="{Binding PauseResumeContent, Mode=OneWay, Converter={converters:PauseOrResumeToStringConverter}}">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{converters:LogicalConverter}">
+                        <MultiBinding.ConverterParameter>
+                            <system:String>
+                                !
+                            </system:String>
+                        </MultiBinding.ConverterParameter>
+                        <MultiBinding.Bindings>
+                            <Binding Path="NumericAndSortsIsEnabled" />
+                        </MultiBinding.Bindings>
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
         </StackPanel>
 
 
